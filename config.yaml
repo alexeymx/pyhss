@@ -24,7 +24,7 @@ hss:
   #Your Home Mobile Country Code (Used for PLMN calcluation)
   MCC: "001"
   #Your Home Mobile Network Code (Used for PLMN calcluation)
-  MNC: "01"
+  MNC: "001"
 
   #Enable GMLC / SLh Interface
   SLh_enabled: False
@@ -117,7 +117,7 @@ eir:
   #tac_database_csv: '/etc/pyhss/tac_database.csv'
 
 logging:
-  level: INFO
+  level: DEBUG
   logfiles:
     hss_logging_file: /var/log/pyhss_hss.log
     diameter_logging_file: /var/log/pyhss_diameter.log
