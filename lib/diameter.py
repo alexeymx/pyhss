@@ -2539,10 +2539,14 @@ class Diameter:
             #Get Subscriber info from Subscription ID
             for SubscriptionIdentifier in self.get_avp_data(avps, 443):
                 for UniqueSubscriptionIdentifier in SubscriptionIdentifier:
-                    self.logTool.log(service='HSS', level='debug', message="[diameter.py] [Answer_16777238_272] [CCA] Evaluating UniqueSubscriptionIdentifier AVP " + str(UniqueSubscriptionIdentifier) + " to find IMSI", redisClient=self.redisMessaging)
+                    self.logTool.log(service='HSS', level='info', message="[diameter.py] [Answer_16777238_272] [CCA] Evaluating UniqueSubscriptionIdentifier AVP " + str(UniqueSubscriptionIdentifier) + " to find IMSI", redisClient=self.redisMessaging)
                     if UniqueSubscriptionIdentifier['avp_code'] == 444:
-                        imsi = binascii.unhexlify(UniqueSubscriptionIdentifier['misc_data']).decode('utf-8')
-                        self.logTool.log(service='HSS', level='debug', message="[diameter.py] [Answer_16777238_272] [CCA] Found IMSI " + str(imsi), redisClient=self.redisMessaging)
+                        value_of_key = binascii.unhexlify(UniqueSubscriptionIdentifier['misc_data']).decode('utf-8')
+                        if len(value_of_key) > 13:
+                            imsi = binascii.unhexlify(UniqueSubscriptionIdentifier['misc_data']).decode('utf-8')
+                            self.logTool.log(service='HSS', level='debug', message="[diameter.py] [Answer_16777238_272] [CCA] Found IMSI " + str(imsi), redisClient=self.redisMessaging)
+                        else:
+                            print("IMSI is too short")
 
             self.logTool.log(service='HSS', level='debug', message="[diameter.py] [Answer_16777238_272] [CCA] SubscriptionID: " + str(self.get_avp_data(avps, 443)), redisClient=self.redisMessaging)
             try:
