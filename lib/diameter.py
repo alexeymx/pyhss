@@ -1520,6 +1520,9 @@ class Diameter:
                 Flow_Information += self.generate_vendor_avp(1058, "80", 10415, Flow_Direction + Flow_Description)
 
             Flow_Status = self.generate_vendor_avp(511, "c0", 10415, self.int_to_hex(2, 4))
+            #Metering-Method
+            Metholding_Method = self.generate_vendor_avp(1007, "c0", 10415, self.int_to_hex(1, 4))
+
             self.logTool.log(service='HSS', level='debug', message="Defined Flow_Status: " + str(Flow_Status), redisClient=self.redisMessaging)
 
             self.logTool.log(service='HSS', level='debug', message="Defining QoS information", redisClient=self.redisMessaging)
@@ -1556,7 +1559,7 @@ class Diameter:
             self.logTool.log(service='HSS', level='debug', message="Defining Precedence information", redisClient=self.redisMessaging)
             Precedence = self.generate_vendor_avp(1010, "c0", 10415, self.int_to_hex(ChargingRules['precedence'], 4))
             self.logTool.log(service='HSS', level='debug', message="Defined Precedence " + str(Precedence), redisClient=self.redisMessaging)
-
+            # need to add Service-Identifier
             #Rating Group
             self.logTool.log(service='HSS', level='debug', message="Defining Rating Group information", redisClient=self.redisMessaging)
             if ChargingRules['rating_group'] != None:
@@ -1568,7 +1571,7 @@ class Diameter:
 
             #Complete Charging Rule Defintion
             self.logTool.log(service='HSS', level='debug', message="Collating ChargingRuleDef", redisClient=self.redisMessaging)
-            ChargingRuleDef = Charging_Rule_Name + Flow_Information + Flow_Status + QoS_Information + Precedence + RatingGroup
+            ChargingRuleDef = Charging_Rule_Name + Flow_Information + Flow_Status + Metholding_Method + QoS_Information + Precedence + RatingGroup
             ChargingRuleDef = self.generate_vendor_avp(1003, "c0", 10415, ChargingRuleDef)
 
             #Charging Rule Install
