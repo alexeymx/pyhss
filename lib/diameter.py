@@ -1521,7 +1521,7 @@ class Diameter:
 
             Flow_Status = self.generate_vendor_avp(511, "c0", 10415, self.int_to_hex(2, 4))
             #Metering-Method
-            Metholding_Method = self.generate_vendor_avp(1007, "c0", 10415, self.int_to_hex(1, 4))
+            #Metholding_Method = self.generate_vendor_avp(1007, "c0", 10415, self.int_to_hex(1, 4))
 
             self.logTool.log(service='HSS', level='debug', message="Defined Flow_Status: " + str(Flow_Status), redisClient=self.redisMessaging)
 
@@ -1571,7 +1571,7 @@ class Diameter:
 
             #Complete Charging Rule Defintion
             self.logTool.log(service='HSS', level='debug', message="Collating ChargingRuleDef", redisClient=self.redisMessaging)
-            ChargingRuleDef = Charging_Rule_Name + Flow_Information + Flow_Status + Metholding_Method + QoS_Information + Precedence + RatingGroup
+            ChargingRuleDef = Charging_Rule_Name + Flow_Information + Flow_Status + QoS_Information + Precedence + RatingGroup
             ChargingRuleDef = self.generate_vendor_avp(1003, "c0", 10415, ChargingRuleDef)
 
             #Charging Rule Install
