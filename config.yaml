@@ -7,7 +7,7 @@ hss:
   bind_ip: ["0.0.0.0"]
 
   #Port to listen on (Same for TCP & SCTP)
-  bind_port: 3868
+  bind_port: 5868
 
   #Value to populate as the OriginHost in Diameter responses
   OriginHost: "hss01"
