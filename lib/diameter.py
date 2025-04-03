@@ -1779,11 +1779,37 @@ class Diameter:
                 Flow_Description = self.generate_vendor_avp(507, "c0", 10415,
                                                             str(binascii.hexlify(str.encode(tft['tft_string'])),
                                                                 'ascii'))
-                Flow_Information += self.generate_vendor_avp(1058, "80", 10415, Flow_Direction + Flow_Description)
+                Flow_Information = self.generate_vendor_avp(1058, "80", 10415, Flow_Direction + Flow_Description)
 
-            Flow_Status = self.generate_vendor_avp(511, "c0", 10415, self.int_to_hex(2, 4))
+            Flow_Status = self.generate_vendor_avp(511, "c0", 10415, self.int_to_hex(ChargingRules['flow_status'], 4))
+            # Reporting-Level
+
+            reporting_level = self.generate_vendor_avp(1011, "c0", 10415, self.int_to_hex(hargingRules['reporting_level'], 4))
             # Metering-Method
-            # Metholding_Method = self.generate_vendor_avp(1007, "c0", 10415, self.int_to_hex(1, 4))
+            metering_method = self.generate_vendor_avp(1007, "c0", 10415, self.int_to_hex(hargingRules['metering_method'], 4))
+
+            if ChargingRules['sponsor_identity']:
+                sponsor_identity =  self.generate_vendor_avp(531, "c0", 10415, str(binascii.hexlify(
+                    str.encode(str(ChargingRules['sponsor_identity']))), 'ascii'))
+            else:
+                sponsor_identity = ''
+
+            redirect_support = self.generate_vendor_avp(1086, "c0", 10415, self.int_to_hex(hargingRules['redirect_support'], 4))
+
+            if ChargingRules['redirect_server_address']:
+                redirect_server_address = self.generate_vendor_avp(435, "c0", 10415, str(binascii.hexlify(
+                    str.encode(str(ChargingRules['redirect_server_address']))), 'ascii'))
+            else:
+                redirect_server_address = ''
+
+            if ChargingRules['tdf_application_identifier']:
+                tdf_application_identifier = self.generate_vendor_avp(1088, "c0", 10415, str(binascii.hexlify(
+                    str.encode(str(ChargingRules['tdf_application_identifier']))), 'ascii'))
+            else:
+                tdf_application_identifier = ''
+
+
+
 
             self.logTool.log(service='HSS', level='debug', message="Defined Flow_Status: " + str(Flow_Status),
                              redisClient=self.redisMessaging)
@@ -1847,6 +1873,12 @@ class Diameter:
                     8))  # Rating-Group-ID
             else:
                 RatingGroup = ''
+
+            if ChargingRules['service_identifier'] != None:
+                ServiceIdentifier = self.generate_avp(439, 40, format(int(ChargingRules['service_identifier']), "x").zfill(
+                    8))  # Rating-Group-ID
+            else:
+                ServiceIdentifier = ''
             self.logTool.log(service='HSS', level='debug',
                              message="Defined Rating Group " + str(ChargingRules['rating_group']),
                              redisClient=self.redisMessaging)
@@ -1854,7 +1886,10 @@ class Diameter:
             # Complete Charging Rule Defintion
             self.logTool.log(service='HSS', level='debug', message="Collating ChargingRuleDef",
                              redisClient=self.redisMessaging)
-            ChargingRuleDef = Charging_Rule_Name + Flow_Information + Flow_Status + QoS_Information + Precedence + RatingGroup
+            ChargingRuleDef = (Charging_Rule_Name + Flow_Information + Flow_Status + QoS_Information + Precedence + RatingGroup +
+                               ServiceIdentifier + reporting_level + metering_method + redirect_support + redirect_server_address +
+                               tdf_application_identifier +
+                               sponsor_identity)
             ChargingRuleDef = self.generate_vendor_avp(1003, "c0", 10415, ChargingRuleDef)
 
             # Charging Rule Install
@@ -2005,6 +2040,8 @@ class Diameter:
         avp += self.generate_avp(260, 40, "000001024000000c" + format(int(16777238), "x").zfill(
             8) + "0000010a4000000c000028af")  # Vendor-Specific-Application-ID (Gx)
         avp += self.generate_avp(258, 40, format(int(16777238), "x").zfill(8))  # Auth-Application-ID - Diameter Gx
+        avp += self.generate_avp(258, 40, format(int(4), "x").zfill(8))  # Auth-Application-ID - Diameter Gy (4)
+
         avp += self.generate_avp(258, 40, format(int(10), "x").zfill(8))  # Auth-Application-ID - Diameter CER
         avp += self.generate_avp(265, 40, format(int(5535), "x").zfill(8))  # Supported-Vendor-ID (3GGP v2)
         avp += self.generate_avp(265, 40, format(int(10415), "x").zfill(8))  # Supported-Vendor-ID (3GPP)

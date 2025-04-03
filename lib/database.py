@@ -100,6 +100,9 @@ class SUBSCRIBER(Base):
     last_modified = Column(String(100), default=datetime.datetime.now(tz=timezone.utc), doc='Timestamp of last modification')
     operation_logs = relationship("SUBSCRIBER_OPERATION_LOG", back_populates="subscriber")
 
+    allowed_tacs = Column(String(512), doc='Comma separated list of allowed TACs for this subscriber', nullable=True)
+    allowed_imeis = Column(String(512), doc='Comma separated list of allowed IMEIs for this subscriber', nullable=True)
+
 class SUBSCRIBER_ROUTING(Base):
     __tablename__ = 'subscriber_routing'
     __table_args__ = (
@@ -212,6 +215,19 @@ class CHARGING_RULE(Base):
     rating_group = Column(Integer, doc='Rating Group in OCS / OFCS that traffic matching this rule will be charged under')
     last_modified = Column(String(100), default=datetime.datetime.now(tz=timezone.utc), doc='Timestamp of last modification')
     operation_logs = relationship("CHARGING_RULE_OPERATION_LOG", back_populates="charging_rule")
+    # added AI.
+    service_identifier = Column(String(20), doc='Service Identifier for this rule', nullable=True)
+    sponsor_identity = Column(String(20), doc='Name of the sponsor for this rule', nullable=True)
+    metering_method = Column(Integer, doc='Metering method for this rule', default=0)
+    reporting_level = Column(Integer, doc='Reporting level for this rule', default=0)
+    redirect_support = Column(Boolean, doc='Whether this rule supports redirection', default=False)
+    redirect_server_address = Column(String(512), doc='Redirect server address for this rule', nullable=True)
+
+    tdf_application_identifier = Column(String(512), doc='TDF application ID for this rule', nullable=True)
+
+    flow_status = Column(Integer, doc='Flow status for this rule (2 - enabled, 3 disabled)', default=2)
+
+
     
 class TFT(Base):
     __tablename__ = 'tft'
@@ -220,6 +236,7 @@ class TFT(Base):
     tft_string = Column(String(100), nullable=False, doc='IPFilterRules as defined in [RFC 6733] taking the format: action dir proto from src to dst')
     direction = Column(Integer, nullable=False, doc='Traffic Direction: 0- Unspecified, 1 - Downlink, 2 - Uplink, 3 - Bidirectional')
     last_modified = Column(String(100), default=datetime.datetime.now(tz=timezone.utc), doc='Timestamp of last modification')
+
     operation_logs = relationship("TFT_OPERATION_LOG", back_populates="tft")
 
 class EIR(Base):
