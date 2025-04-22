@@ -9,7 +9,7 @@ from influxdb import InfluxDBClient
 import threading
 import traceback
 sys.path.append(os.path.realpath('../lib'))
-from messaging import RedisMessaging
+from messagingCluster import RedisMessaging
 from banners import Banners
 from logtool import LogTool
 
@@ -23,7 +23,7 @@ class MetricService:
             print(f"[Metric] Fatal Error - config.yaml not found, exiting.")
             quit()
     
-        self.redisMessaging = RedisMessaging(host=redisHost, port=redisPort)
+        self.redisMessaging = RedisMessaging(host=redisHost, port=redisPort, useCluster=True)
         self.banners = Banners()
         self.logTool = LogTool(config=self.config)
         self.registry = CollectorRegistry(auto_describe=True)

@@ -1,6 +1,6 @@
 import os, sys, json, yaml, time, traceback, socket
 sys.path.append(os.path.realpath('../lib'))
-from messaging import RedisMessaging
+from messagingCluster import RedisMessaging
 from diameter import Diameter
 from banners import Banners
 from logtool import LogTool
@@ -22,7 +22,7 @@ class HssService:
         self.redisUnixSocketPath = self.config.get('redis', {}).get('unixSocketPath', '/var/run/redis/redis-server.sock')
         self.redisHost = self.config.get('redis', {}).get('host', 'localhost')
         self.redisPort = self.config.get('redis', {}).get('port', 6379)
-        self.redisMessaging = RedisMessaging(host=self.redisHost, port=self.redisPort, useUnixSocket=self.redisUseUnixSocket, unixSocketPath=self.redisUnixSocketPath)
+        self.redisMessaging = RedisMessaging(host=self.redisHost, port=self.redisPort, useUnixSocket=self.redisUseUnixSocket, unixSocketPath=self.redisUnixSocketPath, useCluster=True )
         self.logTool = LogTool(config=self.config)
         self.banners = Banners()
         self.mnc = self.config.get('hss', {}).get('MNC', '999')

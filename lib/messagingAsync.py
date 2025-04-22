@@ -2,6 +2,7 @@ import asyncio
 import traceback
 import socket
 import redis.asyncio as redis
+from redis.asyncio.cluster import RedisCluster
 import time, json, uuid
 
 class RedisMessagingAsync:
@@ -13,6 +14,9 @@ class RedisMessagingAsync:
     def __init__(self, host: str='localhost', port: int=6379, useUnixSocket: bool=False, unixSocketPath: str='/var/run/redis/redis-server.sock'):
         if useUnixSocket:
             self.redisClient = redis.Redis(unix_socket_path=unixSocketPath)
+        elif useCluster:
+            # Initialize RedisCluster client for asynchronous usage
+            self.redisClient = RedisCluster(host=host, port=port, decode_responses=True)
         else:
             self.redisClient = redis.Redis(host=host, port=port)
         pass
@@ -170,17 +174,28 @@ class RedisMessagingAsync:
         except Exception as e:
             return ''
 
-    async def awaitBulkMessage(self, key: str, count: int=100, usePrefix: bool=False, prefixHostname: str='unknown', prefixServiceName: str='common'):
+    async def awaitBulkMessage(self, key: str, count: int = 100, usePrefix: bool = False,
+                               prefixHostname: str = 'unknown', prefixServiceName: str = 'common'):
         """
-        Asynchronously blocks until one or more messages are received at the given key, then returns the amount of messages specified by count.
+        Asynchronously block until one or more messages are received at the given key,
+        return the number of messages specified by count.
         """
         try:
-            key = await(self.handlePrefix(key=key, usePrefix=usePrefix, prefixHostname=prefixHostname, prefixServiceName=prefixServiceName))
-            message = await(self.redisClient.blmpop(0, 1, key, direction='RIGHT', count=count))
-            return message
+            key = await self.handlePrefix(key=key, usePrefix=usePrefix, prefixHostname=prefixHostname,
+                                          prefixServiceName=prefixServiceName)
+
+            messages = []
+            for _ in range(count):
+                message = await self.redisClient.brpop(key, timeout=0)  # Blocking pop
+                if not message:
+                    break
+                decoded_message = message[1].decode() if isinstance(message[1], bytes) else message[1]
+                messages.append(decoded_message)
+
+            return messages
         except Exception as e:
             print(traceback.format_exc())
-            return ''
+            return []
 
     async def deleteQueue(self, queue: str, usePrefix: bool=False, prefixHostname: str='unknown', prefixServiceName: str='common') -> bool:
         """

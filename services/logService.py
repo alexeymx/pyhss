@@ -3,7 +3,7 @@ from datetime import datetime
 import time
 import logging
 sys.path.append(os.path.realpath('../lib'))
-from messaging import RedisMessaging
+from messagingCluster import RedisMessaging
 from banners import Banners
 from logtool import LogTool
 
@@ -27,7 +27,7 @@ class LogService:
         self.redisUnixSocketPath = self.config.get('redis', {}).get('unixSocketPath', '/var/run/redis/redis-server.sock')
         self.redisHost = self.config.get('redis', {}).get('host', 'localhost')
         self.redisPort = self.config.get('redis', {}).get('port', 6379)
-        self.redisMessaging = RedisMessaging(host=self.redisHost, port=self.redisPort, useUnixSocket=self.redisUseUnixSocket, unixSocketPath=self.redisUnixSocketPath)
+        self.redisMessaging = RedisMessaging(host=self.redisHost, port=self.redisPort, useUnixSocket=self.redisUseUnixSocket, unixSocketPath=self.redisUnixSocketPath, useCluster=True)
         self.logFilePaths = self.config.get('logging', {}).get('logfiles', {})
         self.logLevels = {
         'CRITICAL': {'verbosity': 1, 'logging': logging.CRITICAL},

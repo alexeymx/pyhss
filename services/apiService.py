@@ -13,7 +13,7 @@ import sqlalchemy
 import socket
 from logtool import LogTool
 from diameter import Diameter
-from messaging import RedisMessaging
+from messagingCluster import RedisMessaging
 import database
 import yaml
 
@@ -37,7 +37,7 @@ redisUnixSocketPath = config.get('redis', {}).get('unixSocketPath', '/var/run/re
 
 insecureAuc = config.get('api', {}).get('enable_insecure_auc', False)
 
-redisMessaging = RedisMessaging(host=redisHost, port=redisPort, useUnixSocket=redisUseUnixSocket, unixSocketPath=redisUnixSocketPath)
+redisMessaging = RedisMessaging(host=redisHost, port=redisPort, useUnixSocket=redisUseUnixSocket, unixSocketPath=redisUnixSocketPath, useCluster=True)
 
 logTool = LogTool(config)
 
