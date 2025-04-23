@@ -1,0 +1,51 @@
+name: Send Webhook with Card Widget
+
+on:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  send-webhook:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send Webhook with Card
+        run: |
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            -d '{
+                  "cards": [
+                    {
+                      "header": {
+                        "title": "GitHub CI Notification",
+                        "subtitle": "Details of the latest push"
+                      },
+                      "sections": [
+                        {
+                          "widgets": [
+                            {
+                              "keyValue": {
+                                "topLabel": "Repository",
+                                "content": "'"${GITHUB_REPOSITORY}"'"
+                              }
+                            },
+                            {
+                              "keyValue": {
+                                "topLabel": "Commit Message",
+                                "content": "'"${{ github.event.head_commit.message }}"'"
+                              }
+                            },
+                            {
+                              "keyValue": {
+                                "topLabel": "Pusher",
+                                "content": "'"${GITHUB_ACTOR}"'"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+               }' \
+            "https://chat.googleapis.com/v1/spaces/AAQA3uomFlc/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=KQ5iCCz8GDuW9a8AD7e-n_-KAydyb95-AJTnGddQnq8"

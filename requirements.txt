@@ -21,3 +21,5 @@ pydantic_core==2.20.1
 tzlocal==4.3
 influxdb==5.3.1
 xmltodict==0.14.2
+pyosmocom==0.0.7
+comp128==1.0.0
